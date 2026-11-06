@@ -5,6 +5,12 @@
 当前视觉任务是：**抓取黄色方块并放到蓝色方块上**。
 
 > 重要：本仓库包含真实机械臂控制代码。默认只读检查、软件测试或推理服务返回动作，都不等于可以安全地启动机械臂。执行运动前必须固定底座、清空路径、确认校准和设备身份，并保证 Follower 电源开关可立即触达。`Ctrl+C` 和语音“停止任务”都不是硬件急停。
+## 演示图片
+
+### SO-101图片
+
+
+https://github.com/user-attachments/assets/3f69df45-7472-4364-9a56-783e3ba65e77
 
 ## 项目成果
 
@@ -102,7 +108,11 @@ Set-Location "$RepoRoot\双相机ACT训练"
 .\train_dual_act.ps1 -Smoke
 .\train_dual_act.ps1 -Epochs 8 -BatchSize 4
 ```
+## 演示视频
 
+### 主从臂遥操作与轨迹回放
+
+https://github.com/user-attachments/assets/f07a03d5-c790-4d8a-bfb9-8c3dcaff4e1c
 ### 跨机推理
 
 Windows：
