@@ -1,0 +1,60 @@
+{
+  "generated_at": "2026-10-30T00:00:00+08:00",
+  "scope": "docs maintenance for thread 01a13d4f-aafb-7e73-a6d7-420e26922f91",
+  "files": [
+    {
+      "path": "具身智能\\README.md",
+      "size_bytes": 8157,
+      "last_write_time": "2026-10-29T21:39:47.2134780+08:00",
+      "sha256": "E3DEAD322B918FF48A6B6B1C378E450380276970FBE8FBFB920E43731DC637EC"
+    },
+    {
+      "path": "具身智能\\SO101遥操作说明_虚拟机重启后.md",
+      "size_bytes": 6443,
+      "last_write_time": "2026-10-15T10:21:27.4026187+08:00",
+      "sha256": "CD893F9B9EC59077D05258A898CDD2B4162243630ED179DE34DA0BD220796EE6"
+    },
+    {
+      "path": "具身智能\\docs\\README.md",
+      "size_bytes": 2830,
+      "last_write_time": "2026-10-30T13:25:27.0183660+08:00",
+      "sha256": "E68B8B992DA8974AC014A4C0CE3897F9674FAC1A34F6F57DB761BA36C35DACB0"
+    },
+    {
+      "path": "具身智能\\docs\\status\\current.md",
+      "size_bytes": 6104,
+      "last_write_time": "2026-10-30T13:25:15.3704468+08:00",
+      "sha256": "FD95B539582321030777C7E76C9EA56BB05F0B68E3AC101A5EC0FDCEA96E17AA"
+    },
+    {
+      "path": "具身智能\\docs\\handoffs\\2026-10-29_vm-startup-readme.md",
+      "size_bytes": 8477,
+      "last_write_time": "2026-10-29T21:39:47.2175628+08:00",
+      "sha256": "F9F79A21D002E1F22F0743C3CEA39F7FDA228674C97B07C03F550667E23A3B17"
+    },
+    {
+      "path": "具身智能\\docs\\evidence\\2026-10-29_vm-startup-readme.md",
+      "size_bytes": 2757,
+      "last_write_time": "2026-10-29T21:39:47.2186276+08:00",
+      "sha256": "F1A666C6FDE762E9E174C5171AE09C07AEC51D01AB6CF1C0386BA1EAC812B225"
+    },
+    {
+      "path": "具身智能\\docs\\evidence\\2026-10-29_vm-startup-readme.messages.json",
+      "size_bytes": 2111,
+      "last_write_time": "2026-10-30T13:23:07.0695263+08:00",
+      "sha256": "FD474FCEAF4348D5FE93A2571C1FE773A0706D8C754389173B21C64A744CED26"
+    },
+    {
+      "path": "具身智能\\docs\\evidence\\serial-motor-id\\README.md",
+      "size_bytes": 657,
+      "last_write_time": "2026-10-30T13:25:09.5550951+08:00",
+      "sha256": "EBEE65489A59EB33B2E52F2F8FE908E836B4E5E047376EB90CBE64A1EC55849F"
+    },
+    {
+      "path": "具身智能\\docs\\evidence\\serial-motor-id\\2026-10-12_setup-motors_原始日志.txt",
+      "size_bytes": 9414,
+      "last_write_time": "2026-10-12T18:30:00.4567028+08:00",
+      "sha256": "351DEC5BA1587486A789150B372ECCE665B097CAF7F0B42271D7A239A63470E3"
+    }
+  ]
+}

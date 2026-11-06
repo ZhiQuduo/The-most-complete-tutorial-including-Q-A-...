@@ -1,0 +1,56 @@
+test_aspect_preserved_and_black_bars_centered (test_camera_transform.CameraTransformTests.test_aspect_preserved_and_black_bars_centered) ... ok
+test_ccw_turn_moves_rightward_direction_upward (test_camera_transform.CameraTransformTests.test_ccw_turn_moves_rightward_direction_upward) ... ok
+test_invalid_rotation_rejected (test_camera_transform.CameraTransformTests.test_invalid_rotation_rejected) ... ok
+test_inverse_rotation_recovers_original_pixels (test_camera_transform.CameraTransformTests.test_inverse_rotation_recovers_original_pixels) ... ok
+test_no_rotation_is_exact_identity_at_native_size (test_camera_transform.CameraTransformTests.test_no_rotation_is_exact_identity_at_native_size) ... ok
+test_calibration_mismatch_disconnects_without_torque_change (test_diagnose_hold.HoldDiagnosticTests.test_calibration_mismatch_disconnects_without_torque_change) ... ok
+test_critical_read_failure_disconnects_without_torque_change (test_diagnose_hold.HoldDiagnosticTests.test_critical_read_failure_disconnects_without_torque_change) ... ok
+test_readonly_guard_blocks_all_motor_write_entrypoints (test_diagnose_hold.HoldDiagnosticTests.test_readonly_guard_blocks_all_motor_write_entrypoints) ... ok
+test_readonly_sampling_and_optional_failures_preserve_torque (test_diagnose_hold.HoldDiagnosticTests.test_readonly_sampling_and_optional_failures_preserve_torque) ... ok
+test_usb_mismatch_prevents_bus_creation (test_diagnose_hold.HoldDiagnosticTests.test_usb_mismatch_prevents_bus_creation) ... ok
+test_changed_calibration_rejected (test_joint_trial.JointTrialTests.test_changed_calibration_rejected) ... ok
+test_changed_pose_rejected (test_joint_trial.JointTrialTests.test_changed_pose_rejected) ... ok
+test_each_body_axis_has_independent_signed_cap (test_joint_trial.JointTrialTests.test_each_body_axis_has_independent_signed_cap) ... ok
+test_elbow_guard_rejects_wrist_goal_drift (test_joint_trial.JointTrialTests.test_elbow_guard_rejects_wrist_goal_drift) ... ok
+test_elbow_negative_step_holds_wrist_and_gripper (test_joint_trial.JointTrialTests.test_elbow_negative_step_holds_wrist_and_gripper) ... ok
+test_execution_route_uses_bounded_target_and_records_attempt (test_joint_trial.JointTrialTests.test_execution_route_uses_bounded_target_and_records_attempt) ... ok
+test_existing_hold_requires_small_static_goal_error (test_joint_trial.JointTrialTests.test_existing_hold_requires_small_static_goal_error) ... ok
+test_gripper_and_invalid_joint_rejected_before_bus_creation (test_joint_trial.JointTrialTests.test_gripper_and_invalid_joint_rejected_before_bus_creation) ... ok
+test_guard_rejects_more_than_one_degree_before_write (test_joint_trial.JointTrialTests.test_guard_rejects_more_than_one_degree_before_write) ... ok
+test_invalid_wrist_candidate_rejected (test_joint_trial.JointTrialTests.test_invalid_wrist_candidate_rejected) ... ok
+test_nonfinite_model_state_rejected (test_joint_trial.JointTrialTests.test_nonfinite_model_state_rejected) ... ok
+test_nonfinite_prediction_rejected (test_joint_trial.JointTrialTests.test_nonfinite_prediction_rejected) ... ok
+test_prediction_converted_using_matching_calibration (test_joint_trial.JointTrialTests.test_prediction_converted_using_matching_calibration) ... ok
+test_preview_has_no_motion_or_torque_writes (test_joint_trial.JointTrialTests.test_preview_has_no_motion_or_torque_writes) ... ok
+test_same_observation_cannot_be_executed_twice (test_joint_trial.JointTrialTests.test_same_observation_cannot_be_executed_twice) ... ok
+test_unstable_off_pose_rejected_without_writes (test_joint_trial.JointTrialTests.test_unstable_off_pose_rejected_without_writes) ... ok
+test_wrist_moves_one_degree_other_targets_unchanged (test_joint_trial.JointTrialTests.test_wrist_moves_one_degree_other_targets_unchanged) ... ok
+test_board_number_is_not_identity (test_probe.ProbeTests.test_board_number_is_not_identity) ... ok
+test_invalid_state_is_rejected (test_probe.ProbeTests.test_invalid_state_is_rejected) ... ok
+test_missing_board_rejected (test_probe.ProbeTests.test_missing_board_rejected) ... ok
+test_calibration_mismatch_stops_and_closes (test_readonly_arm.ReadOnlyCaptureTests.test_calibration_mismatch_stops_and_closes) ... ok
+test_read_error_closes_without_torque_change (test_readonly_arm.ReadOnlyCaptureTests.test_read_error_closes_without_torque_change) ... ok
+test_success_preserves_torque (test_readonly_arm.ReadOnlyCaptureTests.test_success_preserves_torque) ... ok
+test_wrong_model_stops_and_closes (test_readonly_arm.ReadOnlyCaptureTests.test_wrong_model_stops_and_closes) ... ok
+test_drive_mode_and_roundtrip (test_units.UnitConversionTests.test_drive_mode_and_roundtrip) ... ok
+test_invalid_range_rejected (test_units.UnitConversionTests.test_invalid_range_rejected) ... ok
+test_known_degree_scale_and_gripper_preserved (test_units.UnitConversionTests.test_known_degree_scale_and_gripper_preserved) ... ok
+test_per_joint_calibration_scales (test_units.UnitConversionTests.test_per_joint_calibration_scales) ... ok
+test_predictions_are_not_silently_clipped (test_units.UnitConversionTests.test_predictions_are_not_silently_clipped) ... ok
+test_changed_calibration_rejected (test_wrist_trial.WristTrialTests.test_changed_calibration_rejected) ... ok
+test_changed_pose_rejected (test_wrist_trial.WristTrialTests.test_changed_pose_rejected) ... ok
+test_execution_route_uses_bounded_target_and_records_attempt (test_wrist_trial.WristTrialTests.test_execution_route_uses_bounded_target_and_records_attempt) ... ok
+test_guard_rejects_more_than_one_degree_before_write (test_wrist_trial.WristTrialTests.test_guard_rejects_more_than_one_degree_before_write) ... ok
+test_invalid_wrist_candidate_rejected (test_wrist_trial.WristTrialTests.test_invalid_wrist_candidate_rejected) ... ok
+test_nonfinite_model_state_rejected (test_wrist_trial.WristTrialTests.test_nonfinite_model_state_rejected) ... ok
+test_nonfinite_prediction_rejected (test_wrist_trial.WristTrialTests.test_nonfinite_prediction_rejected) ... ok
+test_prediction_converted_using_matching_calibration (test_wrist_trial.WristTrialTests.test_prediction_converted_using_matching_calibration) ... ok
+test_preview_has_no_motion_or_torque_writes (test_wrist_trial.WristTrialTests.test_preview_has_no_motion_or_torque_writes) ... ok
+test_same_observation_cannot_be_executed_twice (test_wrist_trial.WristTrialTests.test_same_observation_cannot_be_executed_twice) ... ok
+test_unstable_off_pose_rejected_without_writes (test_wrist_trial.WristTrialTests.test_unstable_off_pose_rejected_without_writes) ... ok
+test_wrist_moves_one_degree_other_targets_unchanged (test_wrist_trial.WristTrialTests.test_wrist_moves_one_degree_other_targets_unchanged) ... ok
+
+----------------------------------------------------------------------
+Ran 51 tests in 2.058s
+
+OK

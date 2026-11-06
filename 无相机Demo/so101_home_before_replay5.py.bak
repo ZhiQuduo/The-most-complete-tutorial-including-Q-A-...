@@ -1,0 +1,402 @@
+#!/usr/bin/env python3
+"""SO101 起点保存、反馈归位及归位→官方回放→归位。
+
+在 Ubuntu 的 so101 环境运行。save-start/save-current/check 只读硬件；
+home/demo/release 只有明确传入 --execute 才写电机。不修改校准和 PID。
+"""
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+import math
+import subprocess
+import sys
+import time
+from contextlib import contextmanager
+from datetime import datetime, timezone
+from pathlib import Path
+
+JOINTS = ("shoulder_pan", "shoulder_lift", "elbow_flex", "wrist_flex", "wrist_roll", "gripper")
+DEFAULT_CAL = Path.home() / ".cache/huggingface/lerobot/calibration/robots/so_follower/follower_arm.json"
+DEFAULT_POSE = Path.home() / "lerobot/poses/demo_start.json"
+DEFAULT_DATA = Path.home() / "lerobot/recordings/so101_pick_place_01"
+SPEED = {name: (10.0 if name == "gripper" else 5.0) for name in JOINTS}
+TOLERANCE = {name: (2.0 if name == "gripper" else 1.0) for name in JOINTS}
+LEAD = {name: 2.0 for name in JOINTS}
+
+
+def digest(path):
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
+def read_json(path):
+    return json.loads(Path(path).read_text(encoding="utf-8"))
+
+
+def finite_pose(pose):
+    if set(pose) != set(JOINTS):
+        raise ValueError("起点必须包含完整的六个关节。")
+    result = {name: float(pose[name]) for name in JOINTS}
+    if not all(math.isfinite(value) for value in result.values()):
+        raise ValueError("位置包含 NaN 或无穷值。")
+    return result
+
+
+def read_cal(path):
+    cal = read_json(path)
+    if set(cal) != set(JOINTS):
+        raise ValueError("校准文件没有完整的六关节配置。")
+    for index, name in enumerate(JOINTS, 1):
+        entry = cal[name]
+        if int(entry["id"]) != index or int(entry["drive_mode"]) != 0:
+            raise ValueError(f"{name}: 本工具仅支持已验证的 ID 1～6、drive_mode=0 配置。")
+        lo, hi = int(entry["range_min"]), int(entry["range_max"])
+        if not 0 <= lo < hi <= 4095:
+            raise ValueError(f"{name}: 校准范围无效。")
+    return cal
+
+
+def limits(cal):
+    result = {}
+    for name in JOINTS:
+        low, high = cal[name]["range_min"], cal[name]["range_max"]
+        half_range = (high - low) * 180.0 / 4095.0
+        result[name] = (0.0, 100.0) if name == "gripper" else (-half_range, half_range)
+    return result
+
+
+def validate_pose(pose, cal):
+    pose = finite_pose(pose)
+    for name, (low, high) in limits(cal).items():
+        if not low <= pose[name] <= high:
+            raise ValueError(f"{name}={pose[name]:.3f} 超出校准范围 [{low:.3f}, {high:.3f}]。")
+    return pose
+
+
+def from_raw(raw, cal):
+    result = {}
+    for name in JOINTS:
+        lo, hi = cal[name]["range_min"], cal[name]["range_max"]
+        # 不截断实际反馈，超出校准范围时应报错。
+        result[name] = ((raw[name] - lo) * 100.0 / (hi - lo) if name == "gripper"
+                        else (raw[name] - (lo + hi) / 2) * 360.0 / 4095.0)
+    return validate_pose(result, cal)
+
+
+def to_raw(pose, cal):
+    pose = validate_pose(pose, cal)
+    result = {}
+    for name in JOINTS:
+        lo, hi = cal[name]["range_min"], cal[name]["range_max"]
+        raw = (lo + pose[name] * (hi - lo) / 100.0 if name == "gripper"
+               else (lo + hi) / 2 + pose[name] * 4095.0 / 360.0)
+        result[name] = max(lo, min(hi, int(round(raw))))
+    return result
+
+
+def smooth_step(t):
+    t = max(0.0, min(1.0, t))
+    return t * t * t * (10.0 + t * (-15.0 + 6.0 * t))
+
+
+def move_duration(start, target):
+    # 五次插值的最大归一化导数是 1.875，保证目标速度不超 SPEED。
+    return max(3.0, 1.875 * max(abs(target[n] - start[n]) / SPEED[n] for n in JOINTS))
+
+
+def travel_check(start, target):
+    for name in JOINTS[:-1]:
+        if abs(start[name] - target[name]) > 90.0:
+            raise ValueError(f"{name} 归位跨度超过 90 度，请先用已验证的遥操作分段靠近起点。")
+
+
+def print_pose(current, target):
+    print(f"{'关节':<18} {'当前位置':>10} {'起点':>10} {'差值':>10}")
+    for name in JOINTS:
+        print(f"{name:<18} {current[name]:10.2f} {target[name]:10.2f} {target[name]-current[name]:10.2f}")
+    print("前五轴单位：度；gripper 单位：校准范围的百分比。")
+
+
+class Device:
+    """只通过总线读写位置/力矩，不调用会自动上力的 Robot.connect。"""
+
+    def __init__(self, port, cal_path, expected_serial=None):
+        self.port, self.cal_path = port, Path(cal_path)
+        self.cal = read_cal(self.cal_path)
+        self.expected_serial = expected_serial
+        self.bus = None
+        self.wrote_motion = False
+
+    def __enter__(self):
+        from serial.tools.list_ports import comports
+        from lerobot.motors import Motor, MotorCalibration, MotorNormMode
+        from lerobot.motors.feetech import FeetechMotorsBus
+
+        ports = [p for p in comports() if p.device == self.port]
+        if len(ports) != 1 or not ports[0].serial_number:
+            raise RuntimeError("未找到具有 USB 序列号的指定端口，请重新枚举并确认 F 从臂。")
+        self.serial = ports[0].serial_number
+        if self.expected_serial and self.serial != self.expected_serial:
+            raise RuntimeError("USB 序列号与保存起点时不符，可能选到了 L 主臂或更换了控制板。")
+        motors = {n: Motor(i, "sts3215", MotorNormMode.RANGE_0_100 if n == "gripper"
+                           else MotorNormMode.DEGREES) for i, n in enumerate(JOINTS, 1)}
+        self.bus = FeetechMotorsBus(port=self.port, motors=motors,
+                                  calibration={n: MotorCalibration(**self.cal[n]) for n in JOINTS})
+        try:
+            self.bus.connect(handshake=False)
+            self.bus.set_baudrate(1_000_000)
+            for index, name in enumerate(JOINTS, 1):
+                if self.bus.ping(index) != 777:
+                    raise RuntimeError(f"{name}: ID {index} 未返回预期 STS3215 型号。")
+            actual = self.bus.read_calibration()
+            for name in JOINTS:
+                for field in ("id", "homing_offset", "range_min", "range_max"):
+                    if getattr(actual[name], field) != self.cal[name][field]:
+                        raise RuntimeError(f"{name}: 电机校准与文件不一致。先用原遥操作命令复用正确校准。")
+            self.health(require_torque=False)
+            return self
+        except BaseException:
+            self.close()
+            raise
+
+    def health(self, require_torque):
+        modes = self.bus.sync_read("Operating_Mode", normalize=False, num_retry=1)
+        states = self.bus.sync_read("Status", normalize=False, num_retry=1)
+        torque = self.bus.sync_read("Torque_Enable", normalize=False, num_retry=1)
+        for name in JOINTS:
+            if modes[name] != 0 or states[name] != 0 or torque[name] not in (0, 1):
+                raise RuntimeError(f"{name}: 模式/状态/力矩异常，停止继续发送归位目标。")
+            if require_torque and torque[name] != 1:
+                raise RuntimeError(f"{name}: 运动中力矩被关闭。")
+
+    def positions(self):
+        raw = self.bus.sync_read("Present_Position", normalize=False, num_retry=1)
+        return from_raw(raw, self.cal)
+
+    def goal(self, pose):
+        self.wrote_motion = True
+        self.bus.sync_write("Goal_Position", to_raw(pose, self.cal), normalize=False, num_retry=1)
+
+    def prime_and_enable(self):
+        current = self.positions()
+        # 先覆盖旧目标为当前反馈，再上力，避免追逐上次程序遗留的目标。
+        self.goal(current)
+        actual_goal = self.bus.sync_read("Goal_Position", normalize=False, num_retry=1)
+        expected = to_raw(current, self.cal)
+        if any(abs(actual_goal[n] - expected[n]) > 1 for n in JOINTS):
+            raise RuntimeError("目标寄存器预置校验失败，不执行上力。")
+        self.bus.enable_torque(num_retry=1)
+        self.health(require_torque=True)
+        return current
+
+    def freeze(self):
+        # 停在当前反馈位置并保留上力，避免自动卸力使前臂下坠。
+        if self.wrote_motion and self.bus and self.bus.is_connected:
+            try:
+                self.goal(self.positions())
+            except Exception:
+                print("无法确认已停止运动，请立即支撑从臂并切断 F 电机电源。", file=sys.stderr)
+
+    def close(self):
+        if self.bus and self.bus.is_connected:
+            self.bus.disconnect(disable_torque=False)
+
+    def __exit__(self, exc_type, exc, traceback):
+        try:
+            if exc_type is not None:
+                self.freeze()
+        finally:
+            self.close()
+
+
+def home_motion(device, target, clock=time.monotonic, sleep=time.sleep):
+    target = validate_pose(target, device.cal)
+    start = device.positions()
+    travel_check(start, target)
+    duration = move_duration(start, target)
+    device.prime_and_enable()
+    # 上力后的实际反馈可能有变化，因此从新反馈重新规划。
+    start = device.positions()
+    travel_check(start, target)
+    duration = move_duration(start, target)
+    print(f"开始缓慢归位，预计至少 {duration:.1f} 秒；不具备自动避障。", flush=True)
+    started = last_time = clock()
+    progress, settled_since, lag_since = 0.0, None, None
+    last_goal = dict(start)
+    last_health, last_report = started - 1, started - 1
+    while True:
+        now = clock()
+        if now - started > duration * 3 + 10:
+            raise RuntimeError("归位超时，未继续增大目标。")
+        current = device.positions()
+        if now - last_health >= 0.2:
+            device.health(require_torque=True)
+            last_health = now
+        # 必须在目标限幅之前触发，否则卡住时误差会被截在 LEAD 上，永远不超过阈值。
+        lag = any(abs(last_goal[n] - current[n]) > LEAD[n] * 0.75 for n in JOINTS)
+        if lag:
+            lag_since = now if lag_since is None else lag_since
+            if now - lag_since >= 1.5:
+                raise RuntimeError("关节连续跟不上目标，可能受阻；已中止归位。")
+        else:
+            lag_since = None
+            # 暂停/调度延迟时不追赶积压目标，避免补发一大步。
+            elapsed = max(0.0, min(now - last_time, 1.0 / 30.0))
+            progress = min(1.0, progress + elapsed / duration)
+        last_time = now
+        alpha = smooth_step(progress)
+        planned = {n: start[n] + (target[n] - start[n]) * alpha for n in JOINTS}
+        goal = {n: max(current[n] - LEAD[n], min(current[n] + LEAD[n], planned[n])) for n in JOINTS}
+        device.goal(goal)
+        last_goal = goal
+        within = all(abs(target[n] - current[n]) <= TOLERANCE[n] for n in JOINTS)
+        if progress >= 1 and within:
+            settled_since = now if settled_since is None else settled_since
+            if now - settled_since >= 0.5:
+                device.goal(target)
+                print("归位反馈达到设定阈值并稳定 0.5 秒。电机保持上力。")
+                print_pose(current, target)
+                return
+        else:
+            settled_since = None
+        if now - last_report >= 1:
+            print(f"归位进度 {progress*100:5.1f}%", flush=True)
+            last_report = now
+        sleep(max(0.0, 1.0 / 30.0 - (clock() - now)))
+
+
+def first_observation(root):
+    import pyarrow.parquet as pq
+    root = Path(root).resolve()
+    info = read_json(root / "meta/info.json")
+    names = info["features"]["observation.state"]["names"]
+    if set(names) != {n + ".pos" for n in JOINTS}:
+        raise ValueError("本工具仅支持六关节、use_degrees=True 的 SO101 数据。")
+    for data_file in sorted((root / "data").rglob("*.parquet")):
+        parquet = pq.ParquetFile(data_file)
+        for batch in parquet.iter_batches(batch_size=256, columns=["episode_index", "frame_index", "observation.state"]):
+            for row in batch.to_pylist():
+                if row["episode_index"] == 0 and row["frame_index"] == 0:
+                    pose = {n.removesuffix(".pos"): value for n, value in zip(names, row["observation.state"])}
+                    return finite_pose(pose), info
+    raise ValueError("没有找到 episode 0 的第 0 帧。")
+
+
+def save_profile(args):
+    if args.pose.exists():
+        raise FileExistsError(f"起点文件已存在，保留原文件：{args.pose}。需要另存时更换 --pose 路径。")
+    with Device(args.port, args.calibration) as device:
+        if args.command == "save-start":
+            pose, info = first_observation(args.dataset)
+            source = {"root": str(args.dataset.resolve()), "repo_id": info.get("repo_id", args.repo_id),
+                      "info_sha256": digest(args.dataset / "meta/info.json"), "episode": 0}
+        else:
+            samples = [device.positions()]
+            for _ in range(10):
+                time.sleep(0.05)
+                samples.append(device.positions())
+            pose = samples[-1]
+            if any(max(p[n] for p in samples)-min(p[n] for p in samples) >
+                   (1 if n == "gripper" else 0.3) for n in JOINTS):
+                raise RuntimeError("姿态仍在变化，未保存；请稳定支撑后再执行。")
+            source = None
+        pose = validate_pose(pose, device.cal)
+        profile = {"schema": 1, "robot_id": "follower_arm", "use_degrees": True,
+                   "saved_at": datetime.now(timezone.utc).isoformat(), "positions": pose,
+                   "usb_serial": device.serial, "calibration_file": str(args.calibration.resolve()),
+                   "calibration_sha256": digest(args.calibration), "dataset": source}
+    args.pose.parent.mkdir(parents=True, exist_ok=True)
+    with args.pose.open("x", encoding="utf-8") as stream:
+        json.dump(profile, stream, ensure_ascii=False, indent=2)
+        stream.write("\n")
+    print("起点已保存：", args.pose)
+    print("本次只读取电机，没有写入目标或改变力矩。")
+    print_pose(pose, pose)
+
+
+def load_profile(path):
+    profile = read_json(path)
+    if profile["schema"] != 1 or profile["robot_id"] != "follower_arm" or profile["use_degrees"] is not True:
+        raise ValueError("起点文件的类型或单位不匹配。")
+    if not profile.get("usb_serial"):
+        raise ValueError("起点没有绑定控制板 USB 序列号。")
+    if digest(profile["calibration_file"]) != profile["calibration_sha256"]:
+        raise ValueError("校准文件已经变化，请核对并重新保存起点，不要继续使用旧起点。")
+    validate_pose(profile["positions"], read_cal(profile["calibration_file"]))
+    return profile
+
+
+@contextmanager
+def bound_device(args, profile):
+    with Device(args.port, profile["calibration_file"], profile["usb_serial"]) as device:
+        yield device
+
+
+def replay_command(args, profile):
+    dataset = profile.get("dataset")
+    if not dataset:
+        raise ValueError("当前起点由 save-current 保存，未绑定轨迹。demo 请使用 save-start 创建的起点。")
+    if digest(Path(dataset["root"]) / "meta/info.json") != dataset["info_sha256"]:
+        raise ValueError("录制数据的元信息已变化，未执行自动回放。")
+    return [sys.executable, "-m", "lerobot.scripts.lerobot_replay",
+            "--robot.type=so101_follower", f"--robot.port={args.port}",
+            "--robot.id=follower_arm", f"--robot.calibration_dir={Path(profile['calibration_file']).parent}",
+            "--robot.max_relative_target=2", "--robot.disable_torque_on_disconnect=false",
+            f"--dataset.repo_id={dataset['repo_id']}", f"--dataset.root={dataset['root']}",
+            "--dataset.episode=0", "--play_sounds=false"]
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("command", choices=["save-start", "save-current", "check", "home", "demo", "release"])
+    parser.add_argument("--port", required=True, help="本次实际确认的 F 从臂端口，无固定默认值")
+    parser.add_argument("--pose", type=Path, default=DEFAULT_POSE)
+    parser.add_argument("--calibration", type=Path, default=DEFAULT_CAL, help="保存起点时使用的校准文件")
+    parser.add_argument("--dataset", type=Path, default=DEFAULT_DATA, help="save-start 使用的数据集")
+    parser.add_argument("--repo-id", default="local/so101_pick_place_01", help="save-start 绑定的本地数据集名称")
+    parser.add_argument("--execute", action="store_true", help="home/demo/release 的实际执行开关")
+    args = parser.parse_args()
+    try:
+        if args.command in ("save-start", "save-current"):
+            save_profile(args)
+            return 0
+        profile = load_profile(args.pose)
+        command = replay_command(args, profile) if args.command == "demo" else None
+        with bound_device(args, profile) as device:
+            current = device.positions()
+            target = profile["positions"]
+            print_pose(current, target)
+            if args.command != "release":
+                travel_check(current, target)
+                print(f"归位预计至少 {move_duration(current, target):.1f} 秒。")
+            if args.command == "check" or not args.execute:
+                print("只读检查完成，没有发送运动目标，也没有改变力矩。")
+                return 0
+            if args.command == "release":
+                print("正在卸力：必须已支撑好前臂。", flush=True)
+                device.bus.disable_torque(num_retry=1)
+                print("已卸力。")
+                return 0
+            print("3 秒后开始运动：夹爪应空载，确认整条归位路径无遮挡。Ctrl+C 可中断。", flush=True)
+            time.sleep(3)
+            home_motion(device, target)
+        if command is not None:
+            print("归位完成，开始官方轨迹回放。两段程序交接时保持上力。", flush=True)
+            subprocess.run(command, check=True)
+            # 回放失败/被中断时，不再自动归位。
+            print("回放正常结束，开始返回起点。", flush=True)
+            with bound_device(args, profile) as device:
+                home_motion(device, target)
+        print("完成。电机仍保持上力；结束使用时先支撑从臂，再运行 release --execute。")
+        return 0
+    except KeyboardInterrupt:
+        print("\n已中断，不再自动回放或归位。电机可能仍上力；异常时切断 F 电源。", file=sys.stderr)
+        return 130
+    except Exception as exc:
+        print(f"停止：{exc}\n未执行后续动作；电机可能仍上力。异常时切断 F 电源。", file=sys.stderr)
+        return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

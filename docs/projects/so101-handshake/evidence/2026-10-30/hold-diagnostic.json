@@ -1,0 +1,104 @@
+{
+  "source": "User terminal output in current chat; manually transcribed, not raw device acquisition by agent",
+  "time": "2026-10-30; exact sampling time unavailable",
+  "port": "/dev/ttyACM0",
+  "usb_serial": "5B79080161",
+  "joint_order": [
+    "shoulder_pan",
+    "shoulder_lift",
+    "elbow_flex",
+    "wrist_flex",
+    "wrist_roll",
+    "gripper"
+  ],
+  "current_local": [
+    -5.538,
+    -77.451,
+    96.879,
+    25.714,
+    0.22,
+    3.063
+  ],
+  "goal_local": [
+    -5.538,
+    -77.451,
+    96.791,
+    25.714,
+    0.22,
+    3.063
+  ],
+  "raw_error": [
+    0,
+    0,
+    -1,
+    0,
+    0,
+    0
+  ],
+  "torque": [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+  ],
+  "mode": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "status": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "three_sample_span_counts": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "extra_raw": {
+    "elbow_flex": {
+      "CW_Dead_Zone": 1,
+      "CCW_Dead_Zone": 1,
+      "P_Coefficient": 16,
+      "I_Coefficient": 0,
+      "D_Coefficient": 32,
+      "Minimum_Startup_Force": 16,
+      "Torque_Limit": 1000,
+      "Max_Torque_Limit": 1000,
+      "Present_Load": 0,
+      "Present_Current": 0,
+      "Present_Voltage": 119,
+      "Present_Temperature": 29,
+      "Moving": 0
+    },
+    "wrist_flex": {
+      "CW_Dead_Zone": 1,
+      "CCW_Dead_Zone": 1,
+      "P_Coefficient": 16,
+      "I_Coefficient": 0,
+      "D_Coefficient": 32,
+      "Minimum_Startup_Force": 16,
+      "Torque_Limit": 1000,
+      "Max_Torque_Limit": 1000,
+      "Present_Load": 0,
+      "Present_Current": 0,
+      "Present_Voltage": 119,
+      "Present_Temperature": 31,
+      "Moving": 0
+    }
+  },
+  "motor_writes": false,
+  "limitations": "Post-stop static evidence; no current/load physical-unit conversion; not failure-time telemetry"
+}

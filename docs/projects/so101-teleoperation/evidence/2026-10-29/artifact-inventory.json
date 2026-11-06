@@ -1,0 +1,102 @@
+[
+  {
+    "path": "D:\\具身智能\\无相机Demo\\add_home_diagnostics.py",
+    "bytes": 1393,
+    "sha256": "97c20e7ba35b9b37513ff6471ea2dfed2cdee067465b9a8f3f599e843139e5a4"
+  },
+  {
+    "path": "D:\\具身智能\\无相机Demo\\inspect_trajectory.py",
+    "bytes": 3139,
+    "sha256": "b14c52af18ada7b16872d9396370200f9a1450b53bc825d9fcb9c3fb80afa0a6"
+  },
+  {
+    "path": "D:\\具身智能\\无相机Demo\\so101_home.py",
+    "bytes": 19201,
+    "sha256": "0e4ca4df37640e720280dea2739b392cefc9cc9a0437c8cd455c24dc4d60b6bb"
+  },
+  {
+    "path": "D:\\具身智能\\无相机Demo\\so101_home_before_replay5.py.bak",
+    "bytes": 18863,
+    "sha256": "e1a31e2c5144bc113db22601d1f13731810931e6f4f13dcccf69209f6dada1b6"
+  },
+  {
+    "path": "D:\\具身智能\\无相机Demo\\test_so101_home.py",
+    "bytes": 11065,
+    "sha256": "8bb75d6a4beaabb168c8906c375002d6907356eb10863b48ae557a796e8d5550"
+  },
+  {
+    "path": "D:\\具身智能\\无相机Demo\\自动归位使用说明.md",
+    "bytes": 8290,
+    "sha256": "16041281a2e9a5ccbb1c486ae28b9ec06b980248e5d1a08262bd568f0cbab6ae"
+  },
+  {
+    "path": "D:\\具身智能\\无相机Demo\\遥操作到回放完整代码_统一限幅5.md",
+    "bytes": 7979,
+    "sha256": "9a534a829355e691f6e13fc1e46b7da2fd0ddf41edb534d7daca371074b1c649"
+  },
+  {
+    "path": "D:\\具身智能\\无相机Demo\\重新录制与自动回放全流程.md",
+    "bytes": 7533,
+    "sha256": "88ea6e0af49a7b1edf4f92c28897277e9fc370271ddb58039bafcd8709ca96bd"
+  },
+  {
+    "path": "D:\\具身智能\\双相机Demo\\preview_web.py",
+    "bytes": 5840,
+    "sha256": "45503322c83f532d616beb6657527519eea2089ecff12d10ee913639551a5a6c"
+  },
+  {
+    "path": "D:\\具身智能\\双相机Demo\\teleop_web.py",
+    "bytes": 6422,
+    "sha256": "37bd5515dd37611c0ce4d1ed856fedf18865400f51fd2d05f2070787e727c58b"
+  },
+  {
+    "path": "D:\\具身智能\\双相机Demo\\test_teleop_web.py",
+    "bytes": 2079,
+    "sha256": "43447c7411a6d5bd8f0992aade50ab9778020eb09efff7e58ee52bbffe9e3b72"
+  },
+  {
+    "path": "D:\\具身智能\\双相机Demo\\双相机遥操作_浏览器显示.md",
+    "bytes": 4027,
+    "sha256": "ad33c2fdf28c67fae3738cf5afe7a7574fd5718755591bf70b2044eac03e795f"
+  },
+  {
+    "path": "D:\\具身智能\\双相机Demo\\浏览器预览说明.md",
+    "bytes": 2437,
+    "sha256": "34ce5bddec9a91e6a5d3d2db894bebaa03698a43c0689a8c4d84b40bc5aff51f"
+  },
+  {
+    "path": "D:\\具身智能\\语音任务助手\\README.md",
+    "bytes": 2931,
+    "sha256": "ced327cfbfb6f49a7d86351107984b099e096950d999c0599c8e6996b0d99a3f"
+  },
+  {
+    "path": "D:\\具身智能\\语音任务助手\\test_voice_tasks.py",
+    "bytes": 6011,
+    "sha256": "7766c03f2b2e28e36620bc9f2b5810f0e6fc87b504bfa89ab9a270a1add5f4ad"
+  },
+  {
+    "path": "D:\\具身智能\\语音任务助手\\voice_listen.py",
+    "bytes": 3964,
+    "sha256": "33f504d8095cc32cc5015e604e90b96e487114eeb02301b986b6a0eefe9febaf"
+  },
+  {
+    "path": "D:\\具身智能\\语音任务助手\\voice_tasks.py",
+    "bytes": 12720,
+    "sha256": "5ac739bbe1ee55bd45fb5742a110be2efa5527a7385afd35a8c861ff1c6d95c2"
+  },
+  {
+    "path": "D:\\具身智能\\语音任务助手\\voice_test.py",
+    "bytes": 1780,
+    "sha256": "24ba9b59e6fc84a86d3407e2721819fe41e436c00c44bc1810cad4bf7e66877f"
+  },
+  {
+    "path": "D:\\具身智能\\语音任务助手\\任务一语音回放使用说明.md",
+    "bytes": 4308,
+    "sha256": "de779ef3af80ad8b6a807b54be9efc9ea666721bfad9f98f6f53f7cec6f6134b"
+  },
+  {
+    "path": "D:\\具身智能\\语音任务助手\\新增任务二_第三条轨迹.md",
+    "bytes": 3569,
+    "sha256": "06989edb406704177ac36435d1698b7e540e615e3921788c0588bfcb8f510018"
+  }
+]

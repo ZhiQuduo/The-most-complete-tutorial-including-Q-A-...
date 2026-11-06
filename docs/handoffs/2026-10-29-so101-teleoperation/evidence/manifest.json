@@ -1,0 +1,31 @@
+{
+  "thread_id": "01a12dd0-f377-7de2-9266-255836ab4907",
+  "source": "C:\\Users\\Lenovo\\.codex\\sessions\\2026\\10\\12\\rollout-2026-10-12T09-53-50-01a12dd0-f377-7de2-9266-255836ab4907.jsonl",
+  "source_sha256": "e47bcec4a4c90943ee349baed51e528013b1fbe7ae3447f8df92ef83c61789a3",
+  "source_bytes": 38116358,
+  "source_lines": 1912,
+  "event_counts": {
+    "session_meta:": 1,
+    "event_msg:task_started": 72,
+    "response_item:message": 229,
+    "world_state:": 8,
+    "turn_context:": 70,
+    "event_msg:item_completed": 557,
+    "event_msg:token_count": 191,
+    "response_item:custom_tool_call": 101,
+    "token_usage_record:": 181,
+    "response_item:custom_tool_call_output": 100,
+    "response_item:reasoning": 240,
+    "response_item:function_call": 4,
+    "response_item:function_call_output": 4,
+    "event_msg:task_complete": 71,
+    "event_msg:thread_settings_applied": 81,
+    "compacted:": 1,
+    "response_item:configuration_update": 1
+  },
+  "exported_messages": 186,
+  "parse_error_lines": [],
+  "first_timestamp": "2026-10-12T01:54:07.904Z",
+  "last_timestamp": "2026-10-29T13:38:16.806Z",
+  "boundary": "Visible response messages only. Images remain references; no image OCR or hidden reasoning export."
+}

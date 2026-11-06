@@ -1,0 +1,155 @@
+(so101) user@user-virtual-machine:~/lerobot$ lerobot-setup-motors --teleop.type=so101_leader --teleop.port=/dev/ttyACM0
+Connect the controller board to the 'gripper' motor only and press enter.
+Traceback (most recent call last):
+  File "/home/user/miniforge3/envs/so101/lib/python3.12/site-packages/serial/serialposix.py", line 322, in open
+    self.fd = os.open(self.portstr, os.O_RDWR | os.O_NOCTTY | os.O_NONBLOCK)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/dev/ttyACM0'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/user/lerobot/src/lerobot/motors/motors_bus.py", line 532, in _connect
+    if not self.port_handler.openPort():
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/miniforge3/envs/so101/lib/python3.12/site-packages/scservo_sdk/port_handler.py", line 25, in openPort
+    return self.setBaudRate(self.baudrate)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/miniforge3/envs/so101/lib/python3.12/site-packages/scservo_sdk/port_handler.py", line 49, in setBaudRate
+    return self.setupPort(baud)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/miniforge3/envs/so101/lib/python3.12/site-packages/scservo_sdk/port_handler.py", line 95, in setupPort
+    self.ser = serial.Serial(
+               ^^^^^^^^^^^^^^
+  File "/home/user/miniforge3/envs/so101/lib/python3.12/site-packages/serial/serialutil.py", line 244, in __init__
+    self.open()
+  File "/home/user/miniforge3/envs/so101/lib/python3.12/site-packages/serial/serialposix.py", line 325, in open
+    raise SerialException(msg.errno, "could not open port {}: {}".format(self._port, msg))
+serial.serialutil.SerialException: [Errno 13] could not open port /dev/ttyACM0: [Errno 13] Permission denied: '/dev/ttyACM0'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/user/miniforge3/envs/so101/bin/lerobot-setup-motors", line 6, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/home/user/lerobot/src/lerobot/scripts/lerobot_setup_motors.py", line 84, in main
+    setup_motors()
+  File "/home/user/miniforge3/envs/so101/lib/python3.12/site-packages/draccus/argparsing.py", line 234, in wrapper_inner
+    response = fn(cfg, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/lerobot/src/lerobot/scripts/lerobot_setup_motors.py", line 79, in setup_motors
+    setup()
+  File "/home/user/lerobot/src/lerobot/teleoperators/so_leader/so_leader.py", line 142, in setup_motors
+    self.bus.setup_motor(motor)
+  File "/home/user/lerobot/src/lerobot/motors/motors_bus.py", line 609, in setup_motor
+    self._connect(handshake=False)
+  File "/home/user/lerobot/src/lerobot/motors/motors_bus.py", line 537, in _connect
+    raise ConnectionError(
+ConnectionError: 
+Could not connect on port '/dev/ttyACM0'. Make sure you are using the correct port.
+Try running `lerobot-find-port`
+
+(so101) user@user-virtual-machine:~/lerobot$ sudo chmod 666 /dev/ttyACM0
+[sudo] user 的密码： 
+(so101) user@user-virtual-machine:~/lerobot$ lerobot-setup-motors --teleop.type=so101_leader --teleop.port=/dev/ttyACM0
+Connect the controller board to the 'gripper' motor only and press enter.
+'gripper' motor id set to 6
+Connect the controller board to the 'wrist_roll' motor only and press enter.
+'wrist_roll' motor id set to 5
+Connect the controller board to the 'wrist_flex' motor only and press enter.
+'wrist_flex' motor id set to 4
+Connect the controller board to the 'elbow_flex' motor only and press enter.
+'elbow_flex' motor id set to 3
+Connect the controller board to the 'shoulder_lift' motor only and press enter.
+'shoulder_lift' motor id set to 2
+Connect the controller board to the 'shoulder_pan' motor only and press enter.
+'shoulder_pan' motor id set to 1
+(so101) user@user-virtual-machine:~/lerobot$ ls /dev/ttyACM* /dev/ttyUSB* 2>/dev/null
+ /dev/ttyACM0
+(so101) user@user-virtual-machine:~/lerobot$ sudo chmod 666 /dev/ttyACM0
+(so101) user@user-virtual-machine:~/lerobot$ lerobot-setup-motors --robot.type=so101_follower --robot.port=/dev/ttyACM0
+Connect the controller board to the 'gripper' motor only and press enter.
+'gripper' motor id set to 6
+Connect the controller board to the 'wrist_roll' motor only and press enter.
+'wrist_roll' motor id set to 5
+Connect the controller board to the 'wrist_flex' motor only and press enter.^CTraceback (most recent call last):
+  File "/home/user/miniforge3/envs/so101/bin/lerobot-setup-motors", line 6, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/home/user/lerobot/src/lerobot/scripts/lerobot_setup_motors.py", line 84, in main
+    setup_motors()
+  File "/home/user/miniforge3/envs/so101/lib/python3.12/site-packages/draccus/argparsing.py", line 234, in wrapper_inner
+    response = fn(cfg, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/lerobot/src/lerobot/scripts/lerobot_setup_motors.py", line 79, in setup_motors
+    setup()
+  File "/home/user/lerobot/src/lerobot/robots/so_follower/so_follower.py", line 175, in setup_motors
+    input(f"Connect the controller board to the '{motor}' motor only and press enter.")
+KeyboardInterrupt
+
+(so101) user@user-virtual-machine:~/lerobot$ lerobot-setup-motors --robot.type=so101_follower --robot.port=/dev/ttyACM0
+Connect the controller board to the 'gripper' motor only and press enter.
+'gripper' motor id set to 6
+Connect the controller board to the 'wrist_roll' motor only and press enter.
+'wrist_roll' motor id set to 5
+Connect the controller board to the 'wrist_flex' motor only and press enter.^CTraceback (most recent call last):
+  File "/home/user/miniforge3/envs/so101/bin/lerobot-setup-motors", line 6, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/home/user/lerobot/src/lerobot/scripts/lerobot_setup_motors.py", line 84, in main
+    setup_motors()
+  File "/home/user/miniforge3/envs/so101/lib/python3.12/site-packages/draccus/argparsing.py", line 234, in wrapper_inner
+    response = fn(cfg, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/lerobot/src/lerobot/scripts/lerobot_setup_motors.py", line 79, in setup_motors
+    setup()
+  File "/home/user/lerobot/src/lerobot/robots/so_follower/so_follower.py", line 175, in setup_motors
+    input(f"Connect the controller board to the '{motor}' motor only and press enter.")
+KeyboardInterrupt
+
+(so101) user@user-virtual-machine:~/lerobot$ lerobot-setup-motors --robot.type=so101_follower --robot.port=/dev/ttyACM0
+Connect the controller board to the 'gripper' motor only and press enter.
+'gripper' motor id set to 6
+Connect the controller board to the 'wrist_roll' motor only and press enter.
+'wrist_roll' motor id set to 5
+Connect the controller board to the 'wrist_flex' motor only and press enter.
+'wrist_flex' motor id set to 4
+Connect the controller board to the 'elbow_flex' motor only and press enter.
+Traceback (most recent call last):
+  File "/home/user/miniforge3/envs/so101/bin/lerobot-setup-motors", line 6, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/home/user/lerobot/src/lerobot/scripts/lerobot_setup_motors.py", line 84, in main
+    setup_motors()
+  File "/home/user/miniforge3/envs/so101/lib/python3.12/site-packages/draccus/argparsing.py", line 234, in wrapper_inner
+    response = fn(cfg, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/lerobot/src/lerobot/scripts/lerobot_setup_motors.py", line 79, in setup_motors
+    setup()
+  File "/home/user/lerobot/src/lerobot/robots/so_follower/so_follower.py", line 176, in setup_motors
+    self.bus.setup_motor(motor)
+  File "/home/user/lerobot/src/lerobot/motors/motors_bus.py", line 612, in setup_motor
+    initial_baudrate, initial_id = self._find_single_motor(motor)
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/lerobot/src/lerobot/motors/feetech/feetech.py", line 161, in _find_single_motor
+    return self._find_single_motor_p0(motor, initial_baudrate)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/lerobot/src/lerobot/motors/feetech/feetech.py", line 185, in _find_single_motor_p0
+    raise RuntimeError(f"Motor '{motor}' (model '{model}') was not found. Make sure it is connected.")
+RuntimeError: Motor 'elbow_flex' (model 'sts3215') was not found. Make sure it is connected.
+(so101) user@user-virtual-machine:~/lerobot$ lerobot-setup-motors --robot.type=so101_follower --robot.port=/dev/ttyACM0
+Connect the controller board to the 'gripper' motor only and press enter.
+'gripper' motor id set to 6
+Connect the controller board to the 'wrist_roll' motor only and press enter.
+'wrist_roll' motor id set to 5
+Connect the controller board to the 'wrist_flex' motor only and press enter.
+'wrist_flex' motor id set to 4
+Connect the controller board to the 'elbow_flex' motor only and press enter.
+'elbow_flex' motor id set to 3
+Connect the controller board to the 'shoulder_lift' motor only and press enter.
+'shoulder_lift' motor id set to 2
+Connect the controller board to the 'shoulder_pan' motor only and press enter.
+'shoulder_pan' motor id set to 1
+(so101) user@user-virtual-machine:~/lerobot$ 
+
