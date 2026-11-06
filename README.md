@@ -8,10 +8,7 @@
 ## 演示图片
 
 ### SO-101图片
-
-
-https://github.com/user-attachments/assets/3f69df45-7472-4364-9a56-783e3ba65e77
-
+<img width="1707" height="1280" alt="4cd15b1406d5e6eac47e45c3f187a471" src="https://github.com/user-attachments/assets/7152853e-6c32-4760-8634-1ac4f03c08c8" />
 ## 项目成果
 
 | 阶段 | 结果 | 主要入口 |
