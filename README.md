@@ -6,6 +6,9 @@
 
 > 重要：本仓库包含真实机械臂控制代码。默认只读检查、软件测试或推理服务返回动作，都不等于可以安全地启动机械臂。执行运动前必须固定底座、清空路径、确认校准和设备身份，并保证 Follower 电源开关可立即触达。`Ctrl+C` 和语音“停止任务”都不是硬件急停。
 ## 演示图片
+### Lrobot 平台
+
+<img width="8947" height="4565" alt="image" src="https://github.com/user-attachments/assets/2ec9d0f6-a384-4d6c-9353-1991873ef4f6" />
 
 ### SO-101图片
 <img width="1707" height="1280" alt="4cd15b1406d5e6eac47e45c3f187a471" src="https://github.com/user-attachments/assets/7152853e-6c32-4760-8634-1ac4f03c08c8" />
